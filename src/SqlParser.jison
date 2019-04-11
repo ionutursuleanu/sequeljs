@@ -19,6 +19,7 @@
 GROUP\s+BY\b                                     return 'GROUP_BY'
 'HAVING'                                         return 'HAVING'
 ORDER\s+BY\b                                     return 'ORDER_BY'
+'LIMIT'                                          return 'LIMIT'
 (UNION\s+ALL|UNION|INTERSECT|EXCEPT)\b           return 'SET_OPERATOR'
 ','                                              return 'COMMA'
 '+'                                              return 'PLUS'
@@ -97,8 +98,9 @@ selectClause
 selectClauseItem
     : SELECT optDistinctClause optTopClause selectExprList 
       optTableExprList
-      optWhereClause optGroupByClause optHavingClause optOrderByClause optQueryHintsClause
-      { $$ = {nodeType: 'Select', distinct: $2, top: $3, columns: $4, from: $5, where:$6, groupBy:$7, having:$8, orderBy:$9, queryHints:$10}; }
+      optWhereClause optGroupByClause optHavingClause optOrderByClause optLimitClause optQueryHintsClause
+      { $$ = {nodeType: 'Select', distinct: $2, top: $3, columns: $4, from: $5, where:$6, groupBy:$7, having:$8,
+              orderBy:$9, limit:$10, queryHints:$11}; }
     ;
 
 optDistinctClause
@@ -150,6 +152,12 @@ optOrderByNulls
     : { $$ = '';}
     | NULLS FIRST { $$ = 'NULLS FIRST'; }
     | NULLS LAST { $$ = 'NULLS LAST'; }
+    ;
+
+optLimitClause
+    : { $$ = null; }
+    | LIMIT NUMERIC { $$ = $2; }
+    | LIMIT BIND { $$ = $2; }
     ;
 
 optQueryHintsClause

@@ -144,6 +144,10 @@ var SqlPrettyPrinter = {
     if (node.groupBy) this.formatGroupBy(node.groupBy, driver)
     if (node.having) this.formatHaving(node.having, driver)
     if (node.orderBy) this.formatOrderBy(node.orderBy, driver)
+    if (node.limit) {
+      driver.writeLeftKeyword('LIMIT');
+      driver.write(node.limit);
+    }
     if (node.queryHints) this.formatQueryHints(node.queryHints, driver)
     
     driver.restoreCurrentPos()
