@@ -7,12 +7,12 @@ To build SqlParser.js, you need https://nodejs.org/
 
 Linux/OS X
 ```
-$ npm install jison
+$ npm install jison@0.4.15
 $ ./build.sh
 ```
 
 Windows:
 ```
-> npm install jison
+> npm install jison@0.4.15
 > build
 ```
