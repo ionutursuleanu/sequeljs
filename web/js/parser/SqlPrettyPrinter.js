@@ -148,6 +148,10 @@ var SqlPrettyPrinter = {
       driver.writeLeftKeyword('LIMIT');
       driver.write(node.limit);
     }
+    if (node.offset) {
+      driver.write('OFFSET');
+      driver.write(node.offset);
+    }
     if (node.queryHints) this.formatQueryHints(node.queryHints, driver)
     
     driver.restoreCurrentPos()
