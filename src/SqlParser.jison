@@ -363,6 +363,8 @@ summand
     : factor { $$ = $1; }
     | summand PLUS factor { $$ = {nodeType:'Summand', left:$1, right:$3, op:$2}; }
     | summand MINUS factor { $$ = {nodeType:'Summand', left:$1, right:$3, op:$2}; }
+    | PLUS factor { $$ = {nodeType:'Summand', left:0, right:$2, op:$1}; }
+    | MINUS factor { $$ = {nodeType:'Summand', left:0, right:$2, op:$1}; }
     ;
 
 factor
