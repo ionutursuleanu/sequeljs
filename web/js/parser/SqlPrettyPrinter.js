@@ -293,9 +293,22 @@ var SqlPrettyPrinter = {
   },
   formatOperand: function(node, driver) {
     if (node.nodeType == 'TermPlus') {
-      this.formatTermPlus(node, driver)
+      if (node.sign)
+        driver.write(node.sign)
+      this.formatOperand(node.term, driver)
+      if (node.dataType) {
+        driver.writeKeyword('::')
+        driver.writeKeyword(node.dataType.name)
+      }
     } else if (node.nodeType == 'Term') {
-      this.formatTerm(node, driver)
+      if (typeof node.value == 'string') {
+        driver.writeUsingSettingsCase(node.value, 'identifier')
+      } else {
+        /* Sub expression */
+        driver.openParen()
+        this.formatExpressionPlus(node.value, driver);
+        driver.closeParen()
+      }
     } else if (node.nodeType == 'Operand'
             || node.nodeType == 'Factor'
             || node.nodeType == 'Summand') {
@@ -353,29 +366,11 @@ var SqlPrettyPrinter = {
         driver.closeParen()
       }
       driver.closeParen()
-    }
-  },
-  formatTermPlus: function(node, driver) {
-    if (node.nodeType == 'TermPlus') {
-      if (node.sign)
-        driver.write(node.sign)
-      this.formatTerm(node.term, driver)
-      if (node.dataType) {
-        driver.writeKeyword('::')
-        driver.writeKeyword(node.dataType.name)
-      }
-    }
-  },
-  formatTerm: function(node, driver) {
-    if (node.nodeType == 'Term') {
-      if (typeof node.value == 'string') {
-        driver.writeUsingSettingsCase(node.value, 'identifier')
-      } else {
-        /* Sub expression */
-        driver.openParen()
-        this.formatExpressionPlus(node.value, driver);
-        driver.closeParen()
-      }
+    } else if (node.nodeType == 'Array') {
+      driver.writeKeyword('ARRAY')
+      driver.openParen(true)
+      this.formatExpressionPlus(node.value, driver)
+      driver.closeParen()
     }
   },
   formatRhs: function(node, driver) {

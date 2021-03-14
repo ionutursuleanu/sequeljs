@@ -42,6 +42,7 @@ ORDER\s+BY\b                                     return 'ORDER_BY'
 'ALL'                                            return 'ALL'
 'ANY'                                            return 'ANY'
 'SOME'                                           return 'SOME'
+'ARRAY'                                          return 'ARRAY'
 'EXISTS'                                         return 'EXISTS'
 'IS'                                             return 'IS'
 'IN'                                             return 'IN'
@@ -392,6 +393,7 @@ term
     | IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | QUALIFIED_IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | CAST LPAREN expression AS dataType RPAREN { $$ = {nodeType: 'Cast', expression:$3, dataType:$5}; }
+    | ARRAY LPAREN expressionPlus RPAREN { $$ = {nodeType: 'Array', value:$3}; }
     ;
 
 dataType
