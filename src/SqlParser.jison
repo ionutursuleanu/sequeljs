@@ -363,16 +363,20 @@ summand
     : factor { $$ = $1; }
     | summand PLUS factor { $$ = {nodeType:'Summand', left:$1, right:$3, op:$2}; }
     | summand MINUS factor { $$ = {nodeType:'Summand', left:$1, right:$3, op:$2}; }
-    | PLUS factor { $$ = {nodeType:'Summand', left:0, right:$2, op:$1}; }
-    | MINUS factor { $$ = {nodeType:'Summand', left:0, right:$2, op:$1}; }
     ;
 
 factor
-    : term { $$ = $1; }
-    | factor DIVIDE term { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
-    | factor STAR term { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
-    | factor MODULO term { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
+    : termPlus { $$ = $1; }
+    | factor DIVIDE termPlus { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
+    | factor STAR termPlus { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
+    | factor MODULO termPlus { $$ = {nodeType:'Factor', left:$1, right:$3, op:$2}; }
     ;
+
+termPlus
+     : term { $$ = $1 }
+     | PLUS term { $$ = {nodeType: 'TermPlus', sign:$1, value: $2}; }
+     | MINUS term { $$ = {nodeType: 'TermPlus', sign:$1, value: $2}; }
+     ;
 
 term
     : value { $$ = {nodeType: 'Term', value: $1}; }

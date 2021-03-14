@@ -292,15 +292,10 @@ var SqlPrettyPrinter = {
     }
   },
   formatOperand: function(node, driver) {
-    if (node.nodeType == 'Term') {
-      if (typeof node.value == 'string') {
-        driver.writeUsingSettingsCase(node.value, 'identifier')
-      } else {
-        /* Sub expression */
-        driver.openParen()
-        this.formatExpressionPlus(node.value, driver);
-        driver.closeParen()
-      }
+    if (node.nodeType == 'TermPlus') {
+      this.formatTermPlus(node, driver)
+    } else if (node.nodeType == 'Term') {
+      this.formatTerm(node, driver)
     } else if (node.nodeType == 'Operand'
             || node.nodeType == 'Factor'
             || node.nodeType == 'Summand') {
@@ -358,6 +353,24 @@ var SqlPrettyPrinter = {
         driver.closeParen()
       }
       driver.closeParen()
+    }
+  },
+  formatTermPlus: function(node, driver) {
+    if (node.nodeType == 'TermPlus') {
+      driver.write(node.sign)
+      this.formatTerm(node.value, driver)
+    }
+  },
+  formatTerm: function(node, driver) {
+    if (node.nodeType == 'Term') {
+      if (typeof node.value == 'string') {
+        driver.writeUsingSettingsCase(node.value, 'identifier')
+      } else {
+        /* Sub expression */
+        driver.openParen()
+        this.formatExpressionPlus(node.value, driver);
+        driver.closeParen()
+      }
     }
   },
   formatRhs: function(node, driver) {
