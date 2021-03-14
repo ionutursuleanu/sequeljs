@@ -357,8 +357,13 @@ var SqlPrettyPrinter = {
   },
   formatTermPlus: function(node, driver) {
     if (node.nodeType == 'TermPlus') {
-      driver.write(node.sign)
-      this.formatTerm(node.value, driver)
+      if (node.sign)
+        driver.write(node.sign)
+      this.formatTerm(node.term, driver)
+      if (node.dataType) {
+        driver.writeKeyword('::')
+        driver.writeKeyword(node.dataType.name)
+      }
     }
   },
   formatTerm: function(node, driver) {
