@@ -91,7 +91,17 @@ N?['](\\.|[^'])*[']                              return 'STRING'
 %% /* language grammar */
 
 main
-    : selectClause EOF { return {nodeType: 'Main', value: $1}; } 
+    : withClause selectClause EOF { return {nodeType: 'Main', with: $1, select: $2}; }
+    | selectClause EOF { return {nodeType: 'Main', select: $1}; }
+    ;
+
+withClause
+    : withClause COMMA withClauseItem { $$ = $1; $1.push($3); }
+    | WITH withClauseItem { $$ = [$2]; }
+    ;
+
+withClauseItem
+    : IDENTIFIER AS LPAREN expressionPlus RPAREN { $$ = {includeAs: $1, expressionPlus: $4}; }
     ;
 
 selectClause
