@@ -178,6 +178,9 @@ var SqlPrettyPrinter = {
       driver.write(node.offset);
     }
     if (node.queryHints) this.formatQueryHints(node.queryHints, driver)
+    if (node.forUpdate) {
+      driver.writeLeftKeyword('FOR UPDATE')
+    }
     
     driver.restoreCurrentPos()
   },

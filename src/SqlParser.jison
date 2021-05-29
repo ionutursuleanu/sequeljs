@@ -22,6 +22,7 @@ ORDER\s+BY\b                                     return 'ORDER_BY'
 'LIMIT'                                          return 'LIMIT'
 'OFFSET'                                         return 'OFFSET'
 (UNION\s+ALL|UNION|INTERSECT|EXCEPT)\b           return 'SET_OPERATOR'
+FOR\s+UPDATE\b                                   return 'FOR_UPDATE'
 ','                                              return 'COMMA'
 '+'                                              return 'PLUS'
 '-'                                              return 'MINUS'
@@ -111,9 +112,9 @@ selectClause
 selectClauseItem
     : SELECT optDistinctClause optTopClause selectExprList 
       optTableExprList
-      optWhereClause optGroupByClause optHavingClause optOrderByClause optLimitClause optOffsetClause optQueryHintsClause
+      optWhereClause optGroupByClause optHavingClause optOrderByClause optLimitClause optOffsetClause optQueryHintsClause optForUpdateClause
       { $$ = {nodeType: 'Select', distinct: $2, top: $3, columns: $4, from: $5, where:$6, groupBy:$7, having:$8,
-              orderBy:$9, limit:$10, offset:$11, queryHints:$12}; }
+              orderBy:$9, limit:$10, offset:$11, queryHints:$12, forUpdate:$13}; }
     ;
 
 optDistinctClause
@@ -196,7 +197,12 @@ queryHint
     | queryHint STRING { $$ = $1; $1.push($2); }
     | IDENTIFIER { $$ = [$1]; }
     ;
-    
+
+optForUpdateClause
+    : { $$ = null; }
+    | FOR_UPDATE
+    ;
+
 selectExprList
     : selectExpr { $$ = [$1]; } 
     | selectExprList COMMA selectExpr { $$ = $1; $1.push($3); }
