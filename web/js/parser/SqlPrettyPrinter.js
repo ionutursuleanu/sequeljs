@@ -103,14 +103,15 @@ var SqlPrettyPrinter = {
       }
     }
 
-    if (ast.with) {
-        this.formatWith(ast.with, driver)
-    }
-    this.formatSelect(ast.select, driver)
+    this.formatSelect(ast.value, driver)
 
     return SqlPrettyPrinter.buffer
   },
-  formatWith: function(node, driver) {
+  formatSelect: function(node, driver) {
+    if (node.with) this.formatWith(node.with, driver)
+    this.formatExpressionPlus(node.select, driver)
+  },
+formatWith: function(node, driver) {
     driver.writeKeyword('WITH')
     for (var i = 0; i < node.length; i++) {
       var elem = node[i]
@@ -128,9 +129,6 @@ var SqlPrettyPrinter = {
     driver.openParen()
     this.formatExpressionPlus(node.expressionPlus, driver)
     driver.closeParen()
-  },
-  formatSelect: function(node, driver) {
-    this.formatExpressionPlus(node, driver)
   },
   formatSelectItem: function(node, driver) {
     var leftSize = 6

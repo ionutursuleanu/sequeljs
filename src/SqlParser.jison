@@ -92,21 +92,21 @@ N?['](\\.|[^'])*[']                              return 'STRING'
 %% /* language grammar */
 
 main
-    : withClause selectClause EOF { return {nodeType: 'Main', with: $1, select: $2}; }
-    | selectClause EOF { return {nodeType: 'Main', select: $1}; }
+    : selectClause EOF { return {nodeType: 'Main', value: $1}; }
     ;
 
-withClause
-    : withClause COMMA withClauseItem { $$ = $1; $1.push($3); }
+selectClause
+    : optWithClause expressionPlus { $$ = {with: $1, select: $2}; }
+    | expressionPlus { $$ = {select: $1}; }
+    ;
+
+optWithClause
+    : optWithClause COMMA withClauseItem { $$ = $1; $1.push($3); }
     | WITH withClauseItem { $$ = [$2]; }
     ;
 
 withClauseItem
     : IDENTIFIER AS LPAREN expressionPlus RPAREN { $$ = {includeAs: $1, expressionPlus: $4}; }
-    ;
-
-selectClause
-    : expressionPlus { $$ = $1; }
     ;
 
 selectClauseItem
