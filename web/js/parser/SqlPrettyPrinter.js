@@ -38,7 +38,7 @@ var SqlPrettyPrinter = {
       },
       write: function(st, suppressPrepend) {
         var prepend = ' '
-        if (st == ',' || st == '' || st == ')' || st == 'WITH' || st == 'SELECT') prepend = ''
+        if (st == ',' || st == '' || st == ')' || st == 'WITH' || st == 'SELECT' || st == 'INSERT INTO' || st == 'VALUES') prepend = ''
 
         if (this.prevChar =='(') prepend = ''
 
@@ -80,10 +80,7 @@ var SqlPrettyPrinter = {
       writeLeftKeyword: function(st) {
         var beforeSpace = '\n'
         var cntWhite
-        if (st.toUpperCase() == 'WITH') {
-          beforeSpace = ''
-          cntWhite = this.lastLinePositionElem().leftSize - st.length - 2
-        } else if (st.toUpperCase() == 'SELECT') {
+        if (st.toUpperCase() == 'WITH' || st.toUpperCase() == 'SELECT' || st.toUpperCase() == 'INSERT INTO' || st.toUpperCase() == 'VALUES') {
           beforeSpace = ''
           cntWhite = this.lastLinePositionElem().leftSize - st.length
         } else {
@@ -103,15 +100,13 @@ var SqlPrettyPrinter = {
       }
     }
 
-    this.formatSelect(ast.value, driver)
+    if (ast.with) this.formatWith(ast.with, driver)
+    if (ast.select) this.formatSelect(ast.select, driver)
+    if (ast.insert) this.formatInsert(ast.insert, driver)
 
     return SqlPrettyPrinter.buffer
   },
-  formatSelect: function(node, driver) {
-    if (node.with) this.formatWith(node.with, driver)
-    this.formatExpressionPlus(node.select, driver)
-  },
-formatWith: function(node, driver) {
+  formatWith: function(node, driver) {
     driver.writeKeyword('WITH')
     for (var i = 0; i < node.length; i++) {
       var elem = node[i]
@@ -124,11 +119,14 @@ formatWith: function(node, driver) {
     driver.write('\n')
   },
   formatWithItem: function(node, driver) {
-    driver.writeKeyword(node.includeAs);
+    driver.write(node.includeAs);
     driver.write('AS')
     driver.openParen()
     this.formatExpressionPlus(node.expressionPlus, driver)
     driver.closeParen()
+  },
+  formatSelect: function(node, driver) {
+    this.formatExpressionPlus(node, driver)
   },
   formatSelectItem: function(node, driver) {
     var leftSize = 6
@@ -457,5 +455,39 @@ formatWith: function(node, driver) {
       }
     }
     driver.closeParen()
+  },
+  formatInsert: function(node, driver) {
+    driver.writeKeyword('INSERT INTO')
+    this.formatInsertInto(node.into, driver)
+    driver.write('\n')
+    if (node.values) this.formatValues(node.values, driver)
+    if (node.select) this.formatSelect(node.select, driver)
+  },
+  formatInsertInto: function(node, driver) {
+    driver.write(node.table)
+    driver.openParen()
+    for (var i = 0; i < node.columns.length; i++) {
+      var elem = node.columns[i]
+      driver.writeUsingSettingsCase(elem, 'identifier')
+      if (i != (node.columns.length - 1)) {
+        driver.write(',')
+        driver.write('\n')
+      }
+    }
+    driver.closeParen()
+  },
+  formatValues: function(node, driver) {
+    driver.writeKeyword('VALUES')
+    driver.openParen()
+    for (var i = 0; i < node.values.length; i++) {
+      var elem = node.values[i]
+      this.formatExpression(elem, driver)
+      if (i != (node.values.length - 1)) {
+        driver.write(',')
+        driver.write('\n')
+      }
+    }
+    driver.closeParen()
   }
+
 }

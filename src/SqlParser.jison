@@ -23,6 +23,9 @@ ORDER\s+BY\b                                     return 'ORDER_BY'
 'OFFSET'                                         return 'OFFSET'
 (UNION\s+ALL|UNION|INTERSECT|EXCEPT)\b           return 'SET_OPERATOR'
 FOR\s+UPDATE\b                                   return 'FOR_UPDATE'
+'INSERT'                                         return 'INSERT'
+'INTO'                                           return 'INTO'
+'VALUES'                                         return 'VALUES'
 ','                                              return 'COMMA'
 '+'                                              return 'PLUS'
 '-'                                              return 'MINUS'
@@ -92,12 +95,14 @@ N?['](\\.|[^'])*[']                              return 'STRING'
 %% /* language grammar */
 
 main
-    : selectClause EOF { return {nodeType: 'Main', value: $1}; }
+    : optWithClause selectClause EOF { return {nodeType: 'Main', with: $1, select: $2}; }
+    | selectClause EOF { return {nodeType: 'Main', select: $1}; }
+    | optWithClause insertClause EOF { return {nodeType: 'Main', with: $1, insert: $2}; }
+    | insertClause EOF { return {nodeType: 'Main', insert: $1}; }
     ;
 
 selectClause
-    : optWithClause expressionPlus { $$ = {with: $1, select: $2}; }
-    | expressionPlus { $$ = {select: $1}; }
+    : expressionPlus { $$ = $1; }
     ;
 
 optWithClause
@@ -444,3 +449,26 @@ value
     | BIND { $$ = $1; }
     ;
 
+insertClause
+    : INSERT INTO insertIntoClause optValuesClause selectClause { $$ = {nodeType: 'Insert', into: $3, values: $4, select: $5}; }
+    | INSERT INTO insertIntoClause optValuesClause { $$ = {nodeType: 'Insert', into: $3, values: $4}; }
+    ;
+
+insertIntoClause
+    : tableExprPart LPAREN insertIntoClauseList RPAREN { $$ = {nodeType: 'Into', table: $1, columns: $3}; }
+    ;
+
+insertIntoClauseList
+    : insertIntoClauseList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
+    | IDENTIFIER { $$ = [$1]; }
+    ;
+
+optValuesClause
+    : { $$ = null; }
+    | VALUES LPAREN valuesClauseList RPAREN { $$ = {values: $3}; }
+    ;
+
+valuesClauseList
+    : valuesClauseList COMMA expression { $$ = $1; $1.push($3); }
+    | expression { $$ = [$1]; }
+    ;
