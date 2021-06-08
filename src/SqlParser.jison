@@ -63,6 +63,7 @@ RIGHT\s+JOIN\b                                   return 'RIGHT_JOIN'
 FULL\s+JOIN\b                                    return 'FULL_JOIN'
 NATURAL\s+JOIN\b                                 return 'NATURAL_JOIN'
 CROSS\s+JOIN\b                                   return 'CROSS_JOIN'
+'LATERAL'                                        return 'LATERAL'
 'CASE'                                           return 'CASE'
 'WHEN'                                           return 'WHEN'
 'THEN'                                           return 'THEN'
@@ -231,8 +232,8 @@ tableExprList
 
 tableExpr
     : joinComponent { $$ = {nodeType:'TableExpr', value: [$1]}; }
-    | tableExpr optJoinModifier joinComponent { $$ = $1; $1.value.push({nodeType:'TableExpr', value: $3, modifier:$2}); }
-    | tableExpr optJoinModifier joinComponent ON expression { $$ = $1; $1.value.push({nodeType:'TableExpr', value: $3, modifier:$2, expression:$5}); }
+    | tableExpr optJoinModifier optLateral joinComponent { $$ = $1; $1.value.push({nodeType:'TableExpr', value: $4, modifier:$2, lateral:$3}); }
+    | tableExpr optJoinModifier optLateral joinComponent ON expression { $$ = $1; $1.value.push({nodeType:'TableExpr', value: $4, modifier:$2, expression:$6, lateral:$3}); }
     ;
 
 joinComponent
@@ -271,6 +272,11 @@ optJoinModifier
     | INNER_JOIN       { $$ = 'INNER'; }
     | CROSS_JOIN       { $$ = 'CROSS'; }
     | NATURAL_JOIN     { $$ = 'NATURAL'; }
+    ;
+
+optLateral
+    : { $$ = null; }
+    | LATERAL { $$ = $1; }
     ;
 
 expressionPlus
