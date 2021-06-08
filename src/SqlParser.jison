@@ -78,7 +78,7 @@ CROSS\s+JOIN\b                                   return 'CROSS_JOIN'
 'OPTION'                                         return 'OPTION'
 'WITH'                                           return 'WITH'
 'CAST'                                           return 'CAST'
-'::'                                             return 'PG_CAST'
+'::'                                             return 'DOUBLE_COLON'
 N?['](\\.|[^'])*[']                              return 'STRING'
 'NULL'                                           return 'NULL'
 (true|false)\b                                   return 'BOOLEAN'
@@ -403,11 +403,11 @@ factor
 
 termPlus
      : term { $$ = $1; }
-     | term PG_CAST dataType { $$ = {nodeType: 'TermPlus', term: $1, dataType: $3}; }
+     | term DOUBLE_COLON dataType { $$ = {nodeType: 'TermPlus', term: $1, dataType: $3}; }
      | PLUS term { $$ = {nodeType: 'TermPlus', sign:$1, term: $2}; }
-     | PLUS term PG_CAST dataType { $$ = {nodeType: 'TermPlus', sign: $1, term: $2, dataType: $4}; }
+     | PLUS term DOUBLE_COLON dataType { $$ = {nodeType: 'TermPlus', sign: $1, term: $2, dataType: $4}; }
      | MINUS term { $$ = {nodeType: 'TermPlus', sign:$1, term: $2}; }
-     | MINUS term PG_CAST dataType { $$ = {nodeType: 'TermPlus', sign: $1, term: $2, dataType: $4}; }
+     | MINUS term DOUBLE_COLON dataType { $$ = {nodeType: 'TermPlus', sign: $1, term: $2, dataType: $4}; }
      ;
 
 term
