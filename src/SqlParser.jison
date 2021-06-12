@@ -7,7 +7,7 @@
 %%
 
 [/][*](.|\n)*?[*][/]                             /* skip comments */
-([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*\.["].*["])            return 'QUALIFIED_IDENTIFIER'
+([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*\.["].*?["])            return 'QUALIFIED_IDENTIFIER'
 [a-zA-Z_][a-zA-Z0-9_]*\.\*                       return 'QUALIFIED_STAR'
 \s+                                              /* skip whitespace */
 'SELECT'                                         return 'SELECT'
@@ -84,7 +84,7 @@ N?['](\\.|[^'])*[']                              return 'STRING'
 'NULL'                                           return 'NULL'
 (true|false)\b                                   return 'BOOLEAN'
 [0-9]+(\.[0-9]+)?                                return 'NUMERIC'
-([a-zA-Z_][a-zA-Z0-9_]*)|(["].*["])              return 'IDENTIFIER'
+([a-zA-Z_][a-zA-Z0-9_]*)|(["].*?["])                 return 'IDENTIFIER'
 [?]                                              return 'BIND'
 <<EOF>>                                          return 'EOF'
 .                                                return 'INVALID'
