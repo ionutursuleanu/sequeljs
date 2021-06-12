@@ -27,6 +27,7 @@ FOR\s+UPDATE\b                                   return 'FOR_UPDATE'
 'INTO'                                           return 'INTO'
 'VALUES'                                         return 'VALUES'
 ','                                              return 'COMMA'
+'=>'                                             return 'ARROW'
 '+'                                              return 'PLUS'
 '-'                                              return 'MINUS'
 '/'                                              return 'DIVIDE'
@@ -350,7 +351,8 @@ commaSepExpressionList
     ;
 
 functionParam
-    : expression { $$ = $1; }
+    : IDENTIFIER ARROW expression { $$ = { nodeType: 'ArrowParam', name: $1, value: $3}; }
+    | expression { $$ = $1; }
     | DISTINCT expression { $$ = { nodeType: 'DistinctFunctionParam', value: $2}; }
     | STAR { $$ = $1; }
     | QUALIFIED_STAR { $$ = $1; }
