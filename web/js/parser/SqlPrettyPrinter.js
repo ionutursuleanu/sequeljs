@@ -327,6 +327,9 @@ var SqlPrettyPrinter = {
       }
     } else if (node.nodeType == 'Term') {
       if (typeof node.value == 'string') {
+        if (node.dataType) {
+          driver.writeKeyword(node.dataType)
+        }
         driver.writeUsingSettingsCase(node.value, 'identifier')
       } else {
         /* Sub expression */

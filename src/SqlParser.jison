@@ -413,6 +413,7 @@ termPlus
 term
     : value { $$ = {nodeType: 'Term', value: $1}; }
     | IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
+    | IDENTIFIER value { $$ = {nodeType: 'Term', dataType: $1, value: $2}; }
     | QUOTED_IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
     | QUALIFIED_IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
     | caseWhen { $$ = $1; }
