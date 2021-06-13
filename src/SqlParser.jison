@@ -84,7 +84,7 @@ N?['](\\.|[^'])*[']                              return 'STRING'
 'NULL'                                           return 'NULL'
 (true|false)\b                                   return 'BOOLEAN'
 [0-9]+(\.[0-9]+)?                                return 'NUMERIC'
-([a-zA-Z_][a-zA-Z0-9_]*)|(["].*?["])                 return 'IDENTIFIER'
+([a-zA-Z_][a-zA-Z0-9_]*)|(["].*?["])             return 'IDENTIFIER'
 [?]                                              return 'BIND'
 <<EOF>>                                          return 'EOF'
 .                                                return 'INVALID'
@@ -413,8 +413,8 @@ termPlus
 
 term
     : value { $$ = {nodeType: 'Term', value: $1}; }
+    | IDENTIFIER STRING { $$ = {nodeType: 'Term', dataType: $1, value: $2}; }
     | IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
-    | IDENTIFIER value { $$ = {nodeType: 'Term', dataType: $1, value: $2}; }
     | QUALIFIED_IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
     | caseWhen { $$ = $1; }
     | LPAREN expressionPlus RPAREN { $$ = {nodeType: 'Term', value: $2}; }
