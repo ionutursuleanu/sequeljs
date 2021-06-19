@@ -23,6 +23,7 @@ ORDER\s+BY\b                                     return 'ORDER_BY'
 'OFFSET'                                         return 'OFFSET'
 (UNION\s+ALL|UNION|INTERSECT|EXCEPT)\b           return 'SET_OPERATOR'
 FOR\s+UPDATE\b                                   return 'FOR_UPDATE'
+OF                                               return 'OF'
 'INSERT'                                         return 'INSERT'
 'INTO'                                           return 'INTO'
 'VALUES'                                         return 'VALUES'
@@ -206,6 +207,7 @@ queryHint
 
 optForUpdateClause
     : { $$ = null; }
+    | FOR_UPDATE OF IDENTIFIER { $$ = {nodeType: 'Of', of: $3}; }
     | FOR_UPDATE
     ;
 

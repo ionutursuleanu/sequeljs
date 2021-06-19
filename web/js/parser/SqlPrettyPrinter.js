@@ -175,7 +175,11 @@ var SqlPrettyPrinter = {
     }
     if (node.queryHints) this.formatQueryHints(node.queryHints, driver)
     if (node.forUpdate) {
-      driver.writeLeftKeyword('FOR UPDATE')
+      driver.writeLeftKeyword('FOR UPDATE');
+      if (node.forUpdate.of) {
+        driver.writeKeyword('OF');
+        driver.write(node.forUpdate.of);
+      }
     }
     
     driver.restoreCurrentPos()
