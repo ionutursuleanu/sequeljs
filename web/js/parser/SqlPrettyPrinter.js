@@ -470,12 +470,12 @@ var SqlPrettyPrinter = {
   },
   formatInsert: function(node, driver) {
     driver.writeKeyword('INSERT INTO')
-    this.formatInsertInto(node.into, driver)
+    this.formatInsertInto(node.into, node.select, driver)
     driver.write('\n')
     if (node.values) this.formatValues(node.values, driver)
     if (node.select) this.formatSelect(node.select, driver)
   },
-  formatInsertInto: function(node, driver) {
+  formatInsertInto: function(node, newline, driver) {
     driver.write(node.table)
     driver.openParen()
     if (node.columns) {
@@ -484,6 +484,7 @@ var SqlPrettyPrinter = {
         driver.writeUsingSettingsCase(elem, 'identifier')
         if (i != (node.columns.length - 1)) {
           driver.write(',')
+          if (newline) driver.write('\n')
         }
       }
     }
