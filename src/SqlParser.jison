@@ -261,7 +261,25 @@ tableHintList
     : tableHintList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
     | IDENTIFIER { $$ = [$1]; }
     ;
-    
+
+valuesExpr
+    : VALUES valuesExprTable { $$ = $2; }
+    ;
+
+valuesExprTable
+    : valuesExprTable COMMA valuesExprRow { $$ = $1; $1.push($3); }
+    | valuesExprRow { $$ = [$1]; }
+    ;
+
+valuesExprRow
+    : LPAREN valuesExprRowPart RPAREN { $$ = $2; }
+    ;
+
+valuesExprRowPart
+    : valuesExprRowPart COMMA expression { $$ = $1; $1.push($3); }
+    | expression { $$ = [$1]; }
+    ;
+
 optJoinModifier
     : JOIN             { $$ = ''; }
     | LEFT_JOIN        { $$ = 'LEFT'; }
@@ -461,20 +479,15 @@ insertClause
     ;
 
 insertIntoClause
-    : tableExprPart LPAREN insertIntoClauseList RPAREN { $$ = {nodeType: 'Into', table: $1, columns: $3}; }
+    : tableExprPart LPAREN insertIntoColumnsList RPAREN { $$ = {nodeType: 'Into', table: $1, columns: $3}; }
     ;
 
-insertIntoClauseList
-    : insertIntoClauseList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
+insertIntoColumnsList
+    : insertIntoColumnsList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
     | IDENTIFIER { $$ = [$1]; }
     ;
 
 optValuesClause
     : { $$ = null; }
-    | VALUES LPAREN valuesClauseList RPAREN { $$ = {values: $3}; }
-    ;
-
-valuesClauseList
-    : valuesClauseList COMMA expression { $$ = $1; $1.push($3); }
-    | expression { $$ = [$1]; }
+    | valuesExpr { $$ = $1; }
     ;

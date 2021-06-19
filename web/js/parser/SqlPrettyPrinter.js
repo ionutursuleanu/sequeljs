@@ -474,25 +474,35 @@ var SqlPrettyPrinter = {
   formatInsertInto: function(node, driver) {
     driver.write(node.table)
     driver.openParen()
-    for (var i = 0; i < node.columns.length; i++) {
-      var elem = node.columns[i]
-      driver.writeUsingSettingsCase(elem, 'identifier')
-      if (i != (node.columns.length - 1)) {
-        driver.write(',')
-        driver.write('\n')
+    if (node.columns) {
+      for (var i = 0; i < node.columns.length; i++) {
+        var elem = node.columns[i]
+        driver.writeUsingSettingsCase(elem, 'identifier')
+        if (i != (node.columns.length - 1)) {
+          driver.write(',')
+        }
       }
     }
     driver.closeParen()
   },
   formatValues: function(node, driver) {
     driver.writeKeyword('VALUES')
-    driver.openParen()
-    for (var i = 0; i < node.values.length; i++) {
-      var elem = node.values[i]
-      this.formatExpression(elem, driver)
-      if (i != (node.values.length - 1)) {
+    for (var i = 0; i < node.length; i++) {
+      var elem = node[i]
+      this.formatValuesRow(elem, driver)
+      if (i != (node.length - 1)) {
         driver.write(',')
         driver.write('\n')
+      }
+    }
+  },
+  formatValuesRow: function(node, driver) {
+    driver.openParen()
+    for (var i = 0; i < node.length; i++) {
+      var elem = node[i]
+      this.formatExpression(elem, driver)
+      if (i != (node.length - 1)) {
+        driver.write(',')
       }
     }
     driver.closeParen()
