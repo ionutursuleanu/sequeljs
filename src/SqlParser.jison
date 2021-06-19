@@ -264,7 +264,7 @@ tableHintList
     | IDENTIFIER { $$ = [$1]; }
     ;
 
-valuesExpr
+valuesClause
     : VALUES valuesExprTable { $$ = $2; }
     ;
 
@@ -363,6 +363,7 @@ rhsInTest
 rhsInClause
     : selectClause { $$ = { nodeType: 'RhsInSelect', value: $1}; }
     | expression COMMA commaSepExpressionList { $$ = { nodeType: 'RhsInExpressionList', value: $3}; $3.unshift($1); }
+    | valuesExpr { $$ = { nodeType: 'RhsInValues', value: $1}; }
     ;
 
 commaSepExpressionList
@@ -476,20 +477,15 @@ value
     ;
 
 insertClause
-    : INSERT INTO insertIntoClause optValuesClause selectClause { $$ = {nodeType: 'Insert', into: $3, values: $4, select: $5}; }
-    | INSERT INTO insertIntoClause optValuesClause { $$ = {nodeType: 'Insert', into: $3, values: $4}; }
+    : INSERT INTO insertIntoExpr valuesClause { $$ = {nodeType: 'Insert', into: $3, values: $4}; }
+    | INSERT INTO insertIntoExpr selectClause { $$ = {nodeType: 'Insert', into: $3, select: $4}; }
     ;
 
-insertIntoClause
-    : tableExprPart LPAREN insertIntoColumnsList RPAREN { $$ = {nodeType: 'Into', table: $1, columns: $3}; }
+insertIntoExpr
+    : tableExprPart LPAREN insertIntoExprColumnList RPAREN { $$ = {nodeType: 'Into', table: $1, columns: $3}; }
     ;
 
-insertIntoColumnsList
-    : insertIntoColumnsList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
+insertIntoExprColumnList
+    : insertIntoExprColumnList COMMA IDENTIFIER { $$ = $1; $1.push($3); }
     | IDENTIFIER { $$ = [$1]; }
-    ;
-
-optValuesClause
-    : { $$ = null; }
-    | valuesExpr { $$ = $1; }
     ;

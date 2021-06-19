@@ -442,6 +442,12 @@ var SqlPrettyPrinter = {
         if (i != (node.value.length - 1)) driver.write(',')
       }
       driver.closeParen()
+    } else if (node.nodeType == 'RhsInValues') {
+      if (node.not) driver.writeKeyword('NOT')
+      driver.writeKeyword('IN')
+      driver.openParen()
+      this.formatValues(node.value, false, driver)
+      driver.closeParen()
     } else if (node.nodeType == 'RhsBetween') {
       if (node.not) driver.writeKeyword('NOT')
       driver.writeKeyword('BETWEEN')
@@ -472,7 +478,7 @@ var SqlPrettyPrinter = {
     driver.writeKeyword('INSERT INTO')
     this.formatInsertInto(node.into, node.select, driver)
     driver.write('\n')
-    if (node.values) this.formatValues(node.values, driver)
+    if (node.values) this.formatValues(node.values, true, driver)
     if (node.select) this.formatSelect(node.select, driver)
   },
   formatInsertInto: function(node, newline, driver) {
@@ -490,14 +496,14 @@ var SqlPrettyPrinter = {
     }
     driver.closeParen()
   },
-  formatValues: function(node, driver) {
+  formatValues: function(node, newline, driver) {
     driver.writeKeyword('VALUES')
     for (var i = 0; i < node.length; i++) {
       var elem = node[i]
       this.formatValuesRow(elem, driver)
       if (i != (node.length - 1)) {
         driver.write(',')
-        driver.write('\n')
+        if (newline) driver.write('\n')
       }
     }
   },
