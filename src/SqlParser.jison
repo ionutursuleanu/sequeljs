@@ -341,11 +341,21 @@ conditionRightHandSide
     | rhsBetweenTest { $$ = $1; }
     ;
 
+arrayExpr
+    : ARRAY LPAREN selectClause RPAREN { $$ = {value:$3}; }
+    ;
+
 rhsCompareTest
     : compare operand { $$ = {nodeType: 'RhsCompare', op: $1, value: $2 }; }
     | compare ALL LPAREN selectClause RPAREN { $$ = {nodeType: 'RhsCompareSub', op:$1, kind: $2, value: $4 }; }
     | compare ANY LPAREN selectClause RPAREN { $$ = {nodeType: 'RhsCompareSub', op:$1, kind: $2, value: $4 }; }
     | compare SOME LPAREN selectClause RPAREN { $$ = {nodeType: 'RhsCompareSub', op:$1, kind: $2, value: $4 }; }
+    | compare ALL LPAREN arrayExpr RPAREN { $$ = {nodeType: 'RhsCompareArray', op:$1, kind: $2, value: $4 }; }
+    | compare ANY LPAREN arrayExpr RPAREN { $$ = {nodeType: 'RhsCompareArray', op:$1, kind: $2, value: $4 }; }
+    | compare SOME LPAREN arrayExpr RPAREN { $$ = {nodeType: 'RhsCompareArray', op:$1, kind: $2, value: $4 }; }
+    | compare ALL LPAREN valuesClause RPAREN { $$ = {nodeType: 'RhsCompareValues', op:$1, kind: $2, value: $4 }; }
+    | compare ANY LPAREN valuesClause RPAREN { $$ = {nodeType: 'RhsCompareValues', op:$1, kind: $2, value: $4 }; }
+    | compare SOME LPAREN valuesClause RPAREN { $$ = {nodeType: 'RhsCompareValues', op:$1, kind: $2, value: $4 }; }
     ;
 
 rhsIsTest
@@ -362,8 +372,8 @@ rhsInTest
 
 rhsInClause
     : selectClause { $$ = { nodeType: 'RhsInSelect', value: $1}; }
+    | valuesClause { $$ = { nodeType: 'RhsInValues', value: $1}; }
     | expression COMMA commaSepExpressionList { $$ = { nodeType: 'RhsInExpressionList', value: $3}; $3.unshift($1); }
-    | valuesExpr { $$ = { nodeType: 'RhsInValues', value: $1}; }
     ;
 
 commaSepExpressionList
@@ -442,7 +452,6 @@ term
     | IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | QUALIFIED_IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | CAST LPAREN expression AS dataType RPAREN { $$ = {nodeType: 'Cast', expression:$3, dataType:$5}; }
-    | ARRAY LPAREN expressionPlus RPAREN { $$ = {nodeType: 'Array', value:$3}; }
     ;
 
 dataType

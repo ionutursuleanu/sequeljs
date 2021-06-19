@@ -402,12 +402,13 @@ var SqlPrettyPrinter = {
         driver.closeParen()
       }
       driver.closeParen()
-    } else if (node.nodeType == 'Array') {
-      driver.writeKeyword('ARRAY')
-      driver.openParen()
-      this.formatExpressionPlus(node.value, driver)
-      driver.closeParen()
     }
+  },
+  formatArray: function(node, driver) {
+    driver.writeKeyword('ARRAY')
+    driver.openParen()
+    this.formatSelect(node.value, driver)
+    driver.closeParen()
   },
   formatRhs: function(node, driver) {
     if (node.nodeType == 'RhsCompare') {
@@ -418,6 +419,18 @@ var SqlPrettyPrinter = {
       driver.writeKeyword(node.kind)
       driver.openParen()
       this.formatSelect(node.value, driver)
+      driver.closeParen()
+    } else if (node.nodeType == 'RhsCompareArray') {
+      driver.write(node.op)
+      driver.writeKeyword(node.kind)
+      driver.openParen()
+      this.formatArray(node.value, driver)
+      driver.closeParen()
+    } else if (node.nodeType == 'RhsCompareValues') {
+      driver.write(node.op)
+      driver.writeKeyword(node.kind)
+      driver.openParen()
+      this.formatValues(node.value, false, driver)
       driver.closeParen()
     } else if (node.nodeType == 'RhsIs') {
       driver.writeKeyword('IS')
