@@ -333,6 +333,17 @@ var SqlPrettyPrinter = {
         driver.writeKeyword('::')
         driver.writeKeyword(node.dataType.name)
       }
+    } else if (node.nodeType == 'TermList') {
+      driver.openParen()
+      this.formatExpression(node.firstValue, driver)
+      driver.write(',')
+      for (var i = 0; i < node.nextValues.length; i++) {
+        this.formatExpression(node.nextValues[i], driver)
+        if (i != (node.nextValues.length - 1)) {
+          driver.write(',')
+        }
+      }
+      driver.closeParen()
     } else if (node.nodeType == 'Term') {
       if (typeof node.value == 'string') {
         if (node.dataType) {

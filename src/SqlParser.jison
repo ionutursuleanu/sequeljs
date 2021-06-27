@@ -449,6 +449,7 @@ term
     | QUALIFIED_IDENTIFIER { $$ = {nodeType: 'Term', value: $1}; }
     | caseWhen { $$ = $1; }
     | LPAREN expressionPlus RPAREN { $$ = {nodeType: 'Term', value: $2}; }
+    | LPAREN expression COMMA commaSepExpressionList RPAREN { $$ = {nodeType: 'TermList', firstValue: $2, nextValues: $4}; }
     | IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | QUALIFIED_IDENTIFIER LPAREN optFunctionExpressionList RPAREN { $$ = {nodeType: 'FunctionCall', name: $1, args: $3}; }
     | CAST LPAREN expression AS dataType RPAREN { $$ = {nodeType: 'Cast', expression:$3, dataType:$5}; }
